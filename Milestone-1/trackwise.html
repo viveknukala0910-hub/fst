@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TrackWise — Smart Record Management</title>
+
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <!-- Google Fonts: Syne (display) + DM Sans (body) -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* =============================================
+       CSS VARIABLES — Groww-inspired palette
+    ============================================= */
+    :root {
+      --green-primary: #00b386;
+      --green-dark:    #00836a;
+      --green-light:   #e6fff9;
+      --green-glow:    rgba(0, 179, 134, 0.18);
+      --dark-bg:       #0d1117;
+      --card-bg:       #ffffff;
+      --surface:       #f6faf9;
+      --border:        #e0ede9;
+      --text-primary:  #0d1117;
+      --text-secondary:#516469;
+      --text-muted:    #93a8a3;
+      --accent-red:    #ff4f5e;
+      --accent-amber:  #f5a623;
+      --shadow-sm:     0 2px 8px rgba(0,179,134,0.08);
+      --shadow-md:     0 8px 32px rgba(0,179,134,0.13);
+      --shadow-lg:     0 20px 60px rgba(0,0,0,0.10);
+      --radius:        14px;
+      --radius-sm:     8px;
+    }
+
+    /* =============================================
+       GLOBAL RESET & BASE
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Syne', sans-serif;
+    }
+
+    /* =============================================
+       NAVBAR
+    ============================================= */
+    .navbar-trackwise {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .navbar-brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px var(--green-glow);
+    }
+
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span { color: var(--green-primary); }
+
+    .nav-link-custom {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary) !important;
+      padding: 0.4rem 0.9rem !important;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s, background 0.2s;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+
+    .nav-link-custom:hover,
+    .nav-link-custom.active {
+      color: var(--green-primary) !important;
+      background: var(--green-light);
+    }
+
+    .btn-nav-cta {
+      background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
+      color: #fff !important;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.4rem 1.1rem !important;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px var(--green-glow);
+    }
+
+    .btn-nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0,179,134,0.35);
+    }
+
+    /* =============================================
+       HERO SECTION
+    ============================================= */
+    #home {
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 30%, rgba(0,179,134,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 10% 80%, rgba(0,131,106,0.08) 0%, transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, var(--surface) 100%);
+      padding: 5rem 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Floating decorative rings */
+    #home::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,179,134,0.12);
+      top: -150px; right: -150px;
+      pointer-events: none;
+    }
+
+    #home::after {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,179,134,0.08);
+      bottom: -80px; left: -60px;
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.35rem 0.9rem;
+      border-radius: 50px;
+      border: 1px solid rgba(0,179,134,0.2);
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.3px;
+    }
+
+    .hero-headline {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -1.5px;
+      color: var(--text-primary);
+      margin-bottom: 1.2rem;
+    }
+
+    .hero-headline .highlight {
+      background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+      line-height: 1.65;
+      max-width: 500px;
+      margin-bottom: 2rem;
+    }
+
+    .btn-hero-primary {
+      background: linear-gradient(135deg, var(--green-primary) 0%, var(--green-dark) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.75rem 2rem;
+      box-shadow: 0 8px 24px rgba(0,179,134,0.3);
+      transition: transform 0.25s, box-shadow 0.25s;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,179,134,0.42);
+      color: #fff;
+    }
+
+    .btn-hero-ghost {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.73rem 1.6rem;
+      transition: border-color 0.2s, background 0.2s;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .btn-hero-ghost:hover {
+      border-color: var(--green-primary);
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    /* Stats strip */
+    .stats-strip {
+      display: flex;
+      gap: 2.5rem;
+      margin-top: 2.8rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .stat-item .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Hero visual card */
+    .hero-visual {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      padding: 1.4rem;
+      position: relative;
+      animation: floatCard 4s ease-in-out infinite;
+    }
+
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-10px); }
+    }
+
+    .hero-visual .mini-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.5rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s;
+      cursor: default;
+    }
+
+    .hero-visual .mini-row:hover { background: var(--surface); }
+
+    .hero-visual .mini-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .hero-visual .mini-label { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+    .hero-visual .mini-sub   { font-size: 0.73rem; color: var(--text-muted); }
+
+    .hero-visual .mini-badge {
+      margin-left: auto;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: 50px;
+    }
+
+    /* =============================================
+       SECTION UTILITIES
+    ============================================= */
+    .section-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--green-primary);
+      margin-bottom: 0.5rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      color: var(--text-primary);
+      margin-bottom: 0.6rem;
+    }
+
+    .section-desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+      line-height: 1.65;
+    }
+
+    /* =============================================
+       ADD RECORD SECTION
+    ============================================= */
+    #add-record {
+      padding: 5rem 0;
+      background: #fff;
+    }
+
+    .form-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--green-primary), var(--green-dark));
+      border-radius: 20px 20px 0 0;
+    }
+
+    .form-label-custom {
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      display: flex; align-items: center; gap: 0.35rem;
+    }
+
+    .form-label-custom i { color: var(--green-primary); font-size: 0.85rem; }
+
+    .form-control-custom {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 0.95rem;
+      font-size: 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+      background: var(--surface);
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      width: 100%;
+    }
+
+    .form-control-custom:focus {
+      outline: none;
+      border-color: var(--green-primary);
+      box-shadow: 0 0 0 3px rgba(0,179,134,0.14);
+      background: #fff;
+    }
+
+    .form-control-custom::placeholder { color: var(--text-muted); }
+
+    select.form-control-custom {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2393a8a3' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.9rem center;
+      padding-right: 2.2rem;
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--green-primary) 0%, var(--green-dark) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.8rem 2.4rem;
+      box-shadow: 0 6px 20px rgba(0,179,134,0.28);
+      transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s;
+      display: inline-flex; align-items: center; gap: 0.55rem;
+      cursor: pointer;
+      width: 100%;
+      justify-content: center;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 12px 32px rgba(0,179,134,0.40);
+    }
+
+    .btn-submit:active { transform: scale(0.98); }
+
+    .btn-reset-custom {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.78rem 1.6rem;
+      transition: border-color 0.2s, color 0.2s;
+      cursor: pointer;
+      width: 100%;
+      justify-content: center;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+
+    .btn-reset-custom:hover {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    /* Toast notification */
+    .toast-custom {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      background: var(--green-primary);
+      color: #fff;
+      padding: 0.9rem 1.4rem;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      display: flex; align-items: center; gap: 0.5rem;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(.34,1.56,.64,1), opacity 0.3s;
+      z-index: 2000;
+    }
+
+    .toast-custom.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Info sidebar card */
+    .info-sidebar-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 1.4rem;
+      height: 100%;
+    }
+
+    .info-sidebar-card .info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .info-sidebar-card .info-item:last-child { border-bottom: none; }
+
+    .info-icon-wrap {
+      width: 36px; height: 36px;
+      background: var(--green-light);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--green-primary);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .info-item-title { font-size: 0.83rem; font-weight: 600; color: var(--text-primary); }
+    .info-item-desc  { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* =============================================
+       VIEW RECORDS SECTION
+    ============================================= */
+    #view-records {
+      padding: 5rem 0;
+      background: var(--surface);
+    }
+
+    .records-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .records-toolbar {
+      padding: 1.4rem 1.8rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      background: #fff;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .search-wrap i {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .search-input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: 0.55rem 0.9rem 0.55rem 2.3rem;
+      font-size: 0.875rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+      background: var(--surface);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--green-primary);
+      box-shadow: 0 0 0 3px rgba(0,179,134,0.12);
+      background: #fff;
+    }
+
+    .filter-select {
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: 0.55rem 1.8rem 0.55rem 0.9rem;
+      font-size: 0.875rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-secondary);
+      background: var(--surface);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%2393a8a3' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.7rem center;
+      cursor: pointer;
+      min-width: 130px;
+      transition: border-color 0.2s;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--green-primary);
+      box-shadow: 0 0 0 3px rgba(0,179,134,0.12);
+    }
+
+    .records-count-badge {
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.3rem 0.8rem;
+      border-radius: 50px;
+      white-space: nowrap;
+    }
+
+    /* Table */
+    .table-trackwise {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .table-trackwise thead tr {
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .table-trackwise thead th {
+      padding: 0.9rem 1.2rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .table-trackwise tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .table-trackwise tbody tr:last-child { border-bottom: none; }
+
+    .table-trackwise tbody tr:hover { background: var(--green-light); }
+
+    .table-trackwise tbody td {
+      padding: 1rem 1.2rem;
+      vertical-align: middle;
+      color: var(--text-primary);
+    }
+
+    .enrollment-pill {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: var(--dark-bg);
+      color: var(--green-primary);
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.5px;
+    }
+
+    .name-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .name-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .name-text { font-weight: 600; }
+
+    .course-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.6rem;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .duration-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green-primary);
+      display: inline-block;
+      box-shadow: 0 0 0 2px rgba(0,179,134,0.25);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(0,179,134,0.25); }
+      50%       { box-shadow: 0 0 0 5px rgba(0,179,134,0.08); }
+    }
+
+    .btn-action {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-action:hover {
+      border-color: var(--green-primary);
+      color: var(--green-primary);
+      background: var(--green-light);
+    }
+
+    .btn-action.danger:hover {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+      background: #fff5f5;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      display: none;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      display: block;
+      opacity: 0.4;
+    }
+
+    .empty-state p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    footer {
+      background: var(--dark-bg);
+      color: rgba(255,255,255,0.5);
+      padding: 2.5rem 0;
+      font-size: 0.83rem;
+    }
+
+    footer .footer-brand {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    footer .footer-brand span { color: var(--green-primary); }
+
+    footer a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--green-primary); }
+
+    /* =============================================
+       UTILITIES
+    ============================================= */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border) 30%, var(--border) 70%, transparent);
+      margin: 0;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--green-primary); }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .form-card { padding: 1.5rem; }
+      .records-toolbar { flex-direction: column; align-items: stretch; }
+      .hero-visual { display: none; }
+      .stats-strip { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =============================================
+     NAVBAR
+============================================= -->
+<nav class="navbar-trackwise">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between w-100">
+
+      <!-- Logo -->
+      <a class="navbar-brand-logo" href="#home">
+        <div class="logo-icon"><i class="bi bi-graph-up-arrow"></i></div>
+        <span class="logo-text">Track<span>Wise</span></span>
+      </a>
+
+      <!-- Nav links (desktop) -->
+      <div class="d-none d-md-flex align-items-center gap-1">
+        <a href="#home"        class="nav-link-custom active"><i class="bi bi-house"></i>Home</a>
+        <a href="#add-record"  class="nav-link-custom"><i class="bi bi-plus-circle"></i>Add Record</a>
+        <a href="#view-records" class="nav-link-custom"><i class="bi bi-table"></i>View Records</a>
+      </div>
+
+      <!-- CTA -->
+      <div class="d-flex align-items-center gap-2">
+        <a href="#add-record" class="btn-nav-cta nav-link-custom">
+          <i class="bi bi-plus-lg"></i> New Record
+        </a>
+        <!-- Mobile hamburger -->
+        <button class="d-md-none border-0 bg-transparent" style="font-size:1.4rem;color:var(--text-secondary);"
+          onclick="document.getElementById('mobileMenu').classList.toggle('d-none')">
+          <i class="bi bi-list"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="d-none d-md-none mt-2 pb-1">
+      <a href="#home"         class="nav-link-custom d-block py-2" onclick="document.getElementById('mobileMenu').classList.add('d-none')"><i class="bi bi-house"></i> Home</a>
+      <a href="#add-record"   class="nav-link-custom d-block py-2" onclick="document.getElementById('mobileMenu').classList.add('d-none')"><i class="bi bi-plus-circle"></i> Add Record</a>
+      <a href="#view-records" class="nav-link-custom d-block py-2" onclick="document.getElementById('mobileMenu').classList.add('d-none')"><i class="bi bi-table"></i> View Records</a>
+    </div>
+  </div>
+</nav>
+
+<!-- =============================================
+     HERO / HOME SECTION
+============================================= -->
+<section id="home">
+  <div class="container">
+    <div class="row align-items-center g-5">
+
+      <!-- Left: Text -->
+      <div class="col-lg-6">
+        <div class="hero-badge">
+          <i class="bi bi-stars"></i>
+          Smart Record Management
+        </div>
+
+        <h1 class="hero-headline">
+          Manage Every <span class="highlight">Enrollment</span><br/>
+          with Precision
+        </h1>
+
+        <p class="hero-sub">
+          TrackWise gives you a clean, powerful interface to store, view, and manage
+          course enrollment records — built for institutions that value clarity.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3">
+          <a href="#add-record" class="btn-hero-primary">
+            <i class="bi bi-plus-circle-fill"></i> Add New Record
+          </a>
+          <a href="#view-records" class="btn-hero-ghost">
+            <i class="bi bi-eye"></i> View Records
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-strip">
+          <div class="stat-item">
+            <div class="stat-num" id="totalCount">5</div>
+            <div class="stat-label">Total Records</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">3</div>
+            <div class="stat-label">Active Courses</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">2</div>
+            <div class="stat-label">Instructors</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Preview card -->
+      <div class="col-lg-6 d-none d-lg-block">
+        <div class="hero-visual">
+          <!-- Card header -->
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;">Recent Enrollments</div>
+              <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-top:2px;">5 Active Records</div>
+            </div>
+            <div style="background:var(--green-light);color:var(--green-dark);font-size:0.72rem;font-weight:700;padding:0.3rem 0.7rem;border-radius:50px;">
+              <span class="status-dot me-1"></span>Live
+            </div>
+          </div>
+
+          <!-- Preview rows -->
+          <div class="mini-row">
+            <div class="mini-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">RS</div>
+            <div>
+              <div class="mini-label">Rahul Sharma</div>
+              <div class="mini-sub">Data Science · Dr. Iyer</div>
+            </div>
+            <span class="mini-badge badge" style="background:var(--green-light);color:var(--green-dark);">Active</span>
+          </div>
+
+          <div class="mini-row">
+            <div class="mini-avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c);">PK</div>
+            <div>
+              <div class="mini-label">Priya Krishnan</div>
+              <div class="mini-sub">Full Stack Dev · Ms. Nair</div>
+            </div>
+            <span class="mini-badge badge" style="background:var(--green-light);color:var(--green-dark);">Active</span>
+          </div>
+
+          <div class="mini-row">
+            <div class="mini-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">AM</div>
+            <div>
+              <div class="mini-label">Arjun Mehta</div>
+              <div class="mini-sub">UI/UX Design · Dr. Iyer</div>
+            </div>
+            <span class="mini-badge badge" style="background:#fff8e6;color:#b07a00;">Review</span>
+          </div>
+
+          <!-- Bottom bar -->
+          <div class="mt-3 pt-3" style="border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:0.78rem;color:var(--text-muted);">Updated just now</span>
+            <a href="#view-records" style="font-size:0.78rem;color:var(--green-primary);font-weight:600;text-decoration:none;">
+              View all <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =============================================
+     ADD RECORD SECTION
+============================================= -->
+<section id="add-record">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- Section Header -->
+      <div class="col-12">
+        <div class="section-header">
+          <div class="section-eyebrow"><i class="bi bi-plus-circle-fill"></i> New Entry</div>
+          <h2 class="section-title">Add Enrollment Record</h2>
+          <p class="section-desc">Fill in the details below to register a new course enrollment.</p>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="col-lg-8">
+        <div class="form-card">
+          <form id="enrollmentForm" onsubmit="handleSubmit(event)" novalidate>
+
+            <!-- Row 1: Enrollment ID + Name -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label-custom" for="enrollmentId">
+                  <i class="bi bi-hash"></i> Enrollment ID
+                </label>
+                <input
+                  type="text"
+                  id="enrollmentId"
+                  class="form-control-custom"
+                  placeholder="e.g. TW-2024-001"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom" for="studentName">
+                  <i class="bi bi-person"></i> Full Name
+                </label>
+                <input
+                  type="text"
+                  id="studentName"
+                  class="form-control-custom"
+                  placeholder="e.g. Rahul Sharma"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Row 2: Course + Instructor -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label-custom" for="course">
+                  <i class="bi bi-book"></i> Course
+                </label>
+                <select id="course" class="form-control-custom" required>
+                  <option value="" disabled selected>Select a course</option>
+                  <option value="Data Science">Data Science</option>
+                  <option value="Full Stack Development">Full Stack Development</option>
+                  <option value="UI/UX Design">UI/UX Design</option>
+                  <option value="Cloud Computing">Cloud Computing</option>
+                  <option value="Cybersecurity">Cybersecurity</option>
+                  <option value="Machine Learning">Machine Learning</option>
+                  <option value="DevOps Engineering">DevOps Engineering</option>
+                  <option value="Business Analytics">Business Analytics</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom" for="instructor">
+                  <i class="bi bi-person-badge"></i> Instructor
+                </label>
+                <input
+                  type="text"
+                  id="instructor"
+                  class="form-control-custom"
+                  placeholder="e.g. Dr. Priya Iyer"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Row 3: Start Date + Duration -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label-custom" for="startDate">
+                  <i class="bi bi-calendar3"></i> Start Date
+                </label>
+                <input
+                  type="date"
+                  id="startDate"
+                  class="form-control-custom"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom" for="duration">
+                  <i class="bi bi-clock"></i> Duration
+                </label>
+                <select id="duration" class="form-control-custom" required>
+                  <option value="" disabled selected>Select duration</option>
+                  <option value="1 Month">1 Month</option>
+                  <option value="2 Months">2 Months</option>
+                  <option value="3 Months">3 Months</option>
+                  <option value="4 Months">4 Months</option>
+                  <option value="6 Months">6 Months</option>
+                  <option value="9 Months">9 Months</option>
+                  <option value="12 Months">12 Months</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="row g-2">
+              <div class="col-sm-8">
+                <button type="submit" class="btn-submit">
+                  <i class="bi bi-check2-circle"></i> Save Enrollment Record
+                </button>
+              </div>
+              <div class="col-sm-4">
+                <button type="button" class="btn-reset-custom" onclick="resetForm()">
+                  <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- Info Sidebar -->
+      <div class="col-lg-4">
+        <div class="info-sidebar-card">
+          <div style="font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:800;margin-bottom:1rem;color:var(--text-primary);">
+            <i class="bi bi-info-circle-fill" style="color:var(--green-primary);"></i> Field Guide
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon-wrap"><i class="bi bi-hash"></i></div>
+            <div>
+              <div class="info-item-title">Enrollment ID</div>
+              <div class="info-item-desc">Primary key. Use format TW-YYYY-NNN for consistency.</div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon-wrap"><i class="bi bi-person"></i></div>
+            <div>
+              <div class="info-item-title">Full Name</div>
+              <div class="info-item-desc">Enter the student's complete legal name.</div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon-wrap"><i class="bi bi-book"></i></div>
+            <div>
+              <div class="info-item-title">Course</div>
+              <div class="info-item-desc">Select the program the student is enrolling in.</div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon-wrap"><i class="bi bi-calendar3"></i></div>
+            <div>
+              <div class="info-item-title">Start Date</div>
+              <div class="info-item-desc">The date the student's course officially begins.</div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon-wrap"><i class="bi bi-clock"></i></div>
+            <div>
+              <div class="info-item-title">Duration</div>
+              <div class="info-item-desc">Total length of the enrolled course program.</div>
+            </div>
+          </div>
+
+          <!-- Tip box -->
+          <div style="background:var(--green-light);border:1px solid rgba(0,179,134,0.2);border-radius:var(--radius-sm);padding:0.9rem;margin-top:1rem;">
+            <div style="font-size:0.78rem;font-weight:700;color:var(--green-dark);margin-bottom:0.3rem;">
+              <i class="bi bi-lightbulb-fill"></i> Pro Tip
+            </div>
+            <div style="font-size:0.77rem;color:var(--text-secondary);line-height:1.5;">
+              Records added here will appear in the <strong>View Records</strong> table below instantly.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- =============================================
+     VIEW RECORDS SECTION
+============================================= -->
+<section id="view-records">
+  <div class="container">
+
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="section-eyebrow"><i class="bi bi-table"></i> Data View</div>
+      <h2 class="section-title">Enrollment Records</h2>
+      <p class="section-desc">Browse, search, and filter all stored enrollment entries.</p>
+    </div>
+
+    <!-- Records Card -->
+    <div class="records-card">
+
+      <!-- Toolbar -->
+      <div class="records-toolbar">
+        <!-- Search -->
+        <div class="search-wrap">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search by name, course, or ID…"
+            oninput="filterRecords()"
+          />
+        </div>
+
+        <!-- Course filter -->
+        <select id="courseFilter" class="filter-select" onchange="filterRecords()">
+          <option value="">All Courses</option>
+          <option value="Data Science">Data Science</option>
+          <option value="Full Stack Development">Full Stack Development</option>
+          <option value="UI/UX Design">UI/UX Design</option>
+          <option value="Cloud Computing">Cloud Computing</option>
+          <option value="Cybersecurity">Cybersecurity</option>
+          <option value="Machine Learning">Machine Learning</option>
+        </select>
+
+        <!-- Duration filter -->
+        <select id="durationFilter" class="filter-select" onchange="filterRecords()">
+          <option value="">All Durations</option>
+          <option value="3 Months">3 Months</option>
+          <option value="6 Months">6 Months</option>
+          <option value="12 Months">12 Months</option>
+        </select>
+
+        <!-- Count badge -->
+        <span class="records-count-badge" id="recordsCountBadge">
+          <i class="bi bi-database"></i> 5 Records
+        </span>
+
+        <!-- Clear button -->
+        <button onclick="clearFilters()" style="background:transparent;border:none;color:var(--text-muted);font-size:0.82rem;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:0.3rem;" title="Clear filters">
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
+      </div>
+
+      <!-- Table wrapper (horizontal scroll on mobile) -->
+      <div style="overflow-x:auto;">
+        <table class="table-trackwise" id="recordsTable">
+          <thead>
+            <tr>
+              <th>Enrollment ID</th>
+              <th>Student Name</th>
+              <th>Course</th>
+              <th>Instructor</th>
+              <th>Start Date</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th style="text-align:center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody">
+
+            <!-- Sample Record 1 -->
+            <tr data-name="Rahul Sharma" data-course="Data Science" data-duration="6 Months" data-id="TW-2024-001">
+              <td><span class="enrollment-pill">TW-2024-001</span></td>
+              <td>
+                <div class="name-cell">
+                  <div class="name-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">RS</div>
+                  <span class="name-text">Rahul Sharma</span>
+                </div>
+              </td>
+              <td><span class="course-tag"><i class="bi bi-mortarboard"></i>Data Science</span></td>
+              <td><span style="font-weight:500;">Dr. Priya Iyer</span></td>
+              <td><span style="color:var(--text-secondary);">Jan 15, 2024</span></td>
+              <td><span class="duration-chip"><i class="bi bi-clock"></i>6 Months</span></td>
+              <td><span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.8rem;font-weight:600;color:var(--green-dark);"><span class="status-dot"></span>Active</span></td>
+              <td style="text-align:center;">
+                <div style="display:flex;gap:0.4rem;justify-content:center;">
+                  <a class="btn-action" title="Edit"><i class="bi bi-pencil"></i></a>
+                  <a class="btn-action danger" title="Delete" onclick="deleteRow(this)"><i class="bi bi-trash"></i></a>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Sample Record 2 -->
+            <tr data-name="Priya Krishnan" data-course="Full Stack Development" data-duration="12 Months" data-id="TW-2024-002">
+              <td><span class="enrollment-pill">TW-2024-002</span></td>
+              <td>
+                <div class="name-cell">
+                  <div class="name-avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c);">PK</div>
+                  <span class="name-text">Priya Krishnan</span>
+                </div>
+              </td>
+              <td><span class="course-tag"><i class="bi bi-code-slash"></i>Full Stack Development</span></td>
+              <td><span style="font-weight:500;">Ms. Aisha Nair</span></td>
+              <td><span style="color:var(--text-secondary);">Feb 01, 2024</span></td>
+              <td><span class="duration-chip"><i class="bi bi-clock"></i>12 Months</span></td>
+              <td><span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.8rem;font-weight:600;color:var(--green-dark);"><span class="status-dot"></span>Active</span></td>
+              <td style="text-align:center;">
+                <div style="display:flex;gap:0.4rem;justify-content:center;">
+                  <a class="btn-action" title="Edit"><i class="bi bi-pencil"></i></a>
+                  <a class="btn-action danger" title="Delete" onclick="deleteRow(this)"><i class="bi bi-trash"></i></a>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Sample Record 3 -->
+            <tr data-name="Arjun Mehta" data-course="UI/UX Design" data-duration="3 Months" data-id="TW-2024-003">
+              <td><span class="enrollment-pill">TW-2024-003</span></td>
+              <td>
+                <div class="name-cell">
+                  <div class="name-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">AM</div>
+                  <span class="name-text">Arjun Mehta</span>
+                </div>
+              </td>
+              <td><span class="course-tag"><i class="bi bi-palette"></i>UI/UX Design</span></td>
+              <td><span style="font-weight:500;">Dr. Priya Iyer</span></td>
+              <td><span style="color:var(--text-secondary);">Mar 10, 2024</span></td>
+              <td><span class="duration-chip"><i class="bi bi-clock"></i>3 Months</span></td>
+              <td><span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.8rem;font-weight:600;color:var(--accent-amber);"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent-amber);display:inline-block;"></span>Review</span></td>
+              <td style="text-align:center;">
+                <div style="display:flex;gap:0.4rem;justify-content:center;">
+                  <a class="btn-action" title="Edit"><i class="bi bi-pencil"></i></a>
+                  <a class="btn-action danger" title="Delete" onclick="deleteRow(this)"><i class="bi bi-trash"></i></a>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Sample Record 4 -->
+            <tr data-name="Sneha Patel" data-course="Cloud Computing" data-duration="6 Months" data-id="TW-2024-004">
+              <td><span class="enrollment-pill">TW-2024-004</span></td>
+              <td>
+                <div class="name-cell">
+                  <div class="name-avatar" style="background:linear-gradient(135deg,#43e97b,#38f9d7);">SP</div>
+                  <span class="name-text">Sneha Patel</span>
+                </div>
+              </td>
+              <td><span class="course-tag"><i class="bi bi-cloud"></i>Cloud Computing</span></td>
+              <td><span style="font-weight:500;">Ms. Aisha Nair</span></td>
+              <td><span style="color:var(--text-secondary);">Apr 05, 2024</span></td>
+              <td><span class="duration-chip"><i class="bi bi-clock"></i>6 Months</span></td>
+              <td><span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.8rem;font-weight:600;color:var(--green-dark);"><span class="status-dot"></span>Active</span></td>
+              <td style="text-align:center;">
+                <div style="display:flex;gap:0.4rem;justify-content:center;">
+                  <a class="btn-action" title="Edit"><i class="bi bi-pencil"></i></a>
+                  <a class="btn-action danger" title="Delete" onclick="deleteRow(this)"><i class="bi bi-trash"></i></a>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Sample Record 5 -->
+            <tr data-name="Vikram Nair" data-course="Cybersecurity" data-duration="6 Months" data-id="TW-2024-005">
+              <td><span class="enrollment-pill">TW-2024-005</span></td>
+              <td>
+                <div class="name-cell">
+                  <div class="name-avatar" style="background:linear-gradient(135deg,#fa709a,#fee140);">VN</div>
+                  <span class="name-text">Vikram Nair</span>
+                </div>
+              </td>
+              <td><span class="course-tag"><i class="bi bi-shield-lock"></i>Cybersecurity</span></td>
+              <td><span style="font-weight:500;">Dr. Priya Iyer</span></td>
+              <td><span style="color:var(--text-secondary);">May 20, 2024</span></td>
+              <td><span class="duration-chip"><i class="bi bi-clock"></i>6 Months</span></td>
+              <td><span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.8rem;font-weight:600;color:var(--accent-red);"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent-red);display:inline-block;"></span>Inactive</span></td>
+              <td style="text-align:center;">
+                <div style="display:flex;gap:0.4rem;justify-content:center;">
+                  <a class="btn-action" title="Edit"><i class="bi bi-pencil"></i></a>
+                  <a class="btn-action danger" title="Delete" onclick="deleteRow(this)"><i class="bi bi-trash"></i></a>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+
+        <!-- Empty state (shown when no results) -->
+        <div class="empty-state" id="emptyState">
+          <i class="bi bi-search"></i>
+          <p>No records match your search.<br/>Try adjusting your filters.</p>
+        </div>
+      </div>
+
+      <!-- Table footer -->
+      <div style="padding:0.9rem 1.8rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;background:#fff;">
+        <span style="font-size:0.8rem;color:var(--text-muted);">
+          Showing <span id="shownCount" style="font-weight:700;color:var(--text-primary);">5</span> of <span id="totalRecords" style="font-weight:700;color:var(--text-primary);">5</span> records
+        </span>
+        <div style="font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:0.5rem;">
+          <i class="bi bi-database" style="color:var(--green-primary);"></i>
+          EntityRecord · MySQL
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     FOOTER
+============================================= -->
+<footer>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-3 mb-md-0">
+        <div class="footer-brand">Track<span>Wise</span></div>
+        <div style="margin-top:0.3rem;font-size:0.8rem;">Smart enrollment management for modern institutions.</div>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <div style="display:flex;gap:1.2rem;justify-content:flex-end;flex-wrap:wrap;">
+          <a href="#home">Home</a>
+          <a href="#add-record">Add Record</a>
+          <a href="#view-records">View Records</a>
+        </div>
+        <div style="margin-top:0.8rem;font-size:0.75rem;">
+          © 2024 TrackWise. Built with Bootstrap 5 &amp; Bootstrap Icons.
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- =============================================
+     TOAST NOTIFICATION
+============================================= -->
+<div class="toast-custom" id="toast">
+  <i class="bi bi-check-circle-fill"></i>
+  <span id="toastMsg">Record saved successfully!</span>
+</div>
+
+<!-- =============================================
+     BOOTSTRAP JS CDN
+============================================= -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- =============================================
+     JAVASCRIPT — App Logic
+============================================= -->
+<script>
+  /* ---------- Avatar color palette ---------- */
+  const avatarColors = [
+    "linear-gradient(135deg,#667eea,#764ba2)",
+    "linear-gradient(135deg,#f093fb,#f5576c)",
+    "linear-gradient(135deg,#4facfe,#00f2fe)",
+    "linear-gradient(135deg,#43e97b,#38f9d7)",
+    "linear-gradient(135deg,#fa709a,#fee140)",
+    "linear-gradient(135deg,#a18cd1,#fbc2eb)",
+    "linear-gradient(135deg,#fccb90,#d57eeb)",
+    "linear-gradient(135deg,#84fab0,#8fd3f4)",
+  ];
+
+  /* ---------- Toast helper ---------- */
+  function showToast(msg, isError = false) {
+    const toast = document.getElementById("toast");
+    const toastMsg = document.getElementById("toastMsg");
+    toastMsg.textContent = msg;
+    toast.style.background = isError ? "var(--accent-red)" : "var(--green-primary)";
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3200);
+  }
+
+  /* ---------- Form submit handler ---------- */
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    const id         = document.getElementById("enrollmentId").value.trim();
+    const name       = document.getElementById("studentName").value.trim();
+    const course     = document.getElementById("course").value;
+    const instructor = document.getElementById("instructor").value.trim();
+    const startDate  = document.getElementById("startDate").value;
+    const duration   = document.getElementById("duration").value;
+
+    // Basic validation
+    if (!id || !name || !course || !instructor || !startDate || !duration) {
+      showToast("Please fill in all fields.", true);
+      return;
+    }
+
+    // Check for duplicate Enrollment ID
+    const existingIds = Array.from(document.querySelectorAll(".enrollment-pill"))
+                             .map(el => el.textContent.trim());
+    if (existingIds.includes(id)) {
+      showToast("Enrollment ID already exists!", true);
+      return;
+    }
+
+    // Format date
+    const dateObj    = new Date(startDate);
+    const dateFormatted = dateObj.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+
+    // Initials for avatar
+    const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+    const bg       = avatarColors[Math.floor(Math.random() * avatarColors.length)];
+
+    // Course icon mapping
+    const courseIcons = {
+      "Data Science": "bi-bar-chart-line",
+      "Full Stack Development": "bi-code-slash",
+      "UI/UX Design": "bi-palette",
+      "Cloud Computing": "bi-cloud",
+      "Cybersecurity": "bi-shield-lock",
+      "Machine Learning": "bi-cpu",
+      "DevOps Engineering": "bi-gear",
+      "Business Analytics": "bi-graph-up",
+    };
+    const icon = courseIcons[course] || "bi-mortarboard";
+
+    // Build new row HTML
+    const newRow = document.createElement("tr");
+    newRow.setAttribute("data-name", name.toLowerCase());
+    newRow.setAttribute("data-course", course);
+    newRow.setAttribute("data-duration", duration);
+    newRow.setAttribute("data-id", id.toLowerCase());
+
+    newRow.innerHTML = `
+      <td><span class="enrollment-pill">${id}</span></td>
+      <td>
+        <div class="name-cell">
+          <div class="name-avatar" style="background:${bg};">${initials}</div>
+          <span class="name-text">${name}</span>
+        </div>
+      </td>
+      <td><span class="course-tag"><i class="bi ${icon}"></i>${course}</span></td>
+      <td><span style="font-weight:500;">${instructor}</span></td>
+      <td><span style="color:var(--text-secondary);">${dateFormatted}</span></td>
+      <td><span class="duration-chip"><i class="bi bi-clock"></i>${duration}</span></td>
+      <td><span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.8rem;font-weight:600;color:var(--green-dark);"><span class="status-dot"></span>Active</span></td>
+      <td style="text-align:center;">
+        <div style="display:flex;gap:.4rem;justify-content:center;">
+          <a class="btn-action" title="Edit"><i class="bi bi-pencil"></i></a>
+          <a class="btn-action danger" title="Delete" onclick="deleteRow(this)"><i class="bi bi-trash"></i></a>
+        </div>
+      </td>
+    `;
+
+    // Animate in
+    newRow.style.opacity = "0";
+    newRow.style.transform = "translateY(-8px)";
+    newRow.style.transition = "opacity 0.4s, transform 0.4s";
+
+    document.getElementById("recordsBody").prepend(newRow);
+    requestAnimationFrame(() => {
+      newRow.style.opacity = "1";
+      newRow.style.transform = "translateY(0)";
+    });
+
+    // Update counters
+    updateCounters();
+    showToast(`Record for ${name} saved successfully!`);
+    document.getElementById("enrollmentForm").reset();
+
+    // Scroll to table
+    setTimeout(() => {
+      document.getElementById("view-records").scrollIntoView({ behavior: "smooth" });
+    }, 800);
+  }
+
+  /* ---------- Reset form ---------- */
+  function resetForm() {
+    document.getElementById("enrollmentForm").reset();
+    showToast("Form cleared.", false);
+  }
+
+  /* ---------- Delete row ---------- */
+  function deleteRow(btn) {
+    const row = btn.closest("tr");
+    row.style.transition = "opacity 0.3s, transform 0.3s";
+    row.style.opacity = "0";
+    row.style.transform = "translateX(20px)";
+    setTimeout(() => {
+      row.remove();
+      updateCounters();
+      showToast("Record deleted.", false);
+    }, 300);
+  }
+
+  /* ---------- Filter / search ---------- */
+  function filterRecords() {
+    const search   = document.getElementById("searchInput").value.toLowerCase().trim();
+    const course   = document.getElementById("courseFilter").value.toLowerCase();
+    const duration = document.getElementById("durationFilter").value.toLowerCase();
+
+    const rows  = document.querySelectorAll("#recordsBody tr");
+    let visible = 0;
+
+    rows.forEach(row => {
+      const name     = (row.getAttribute("data-name")     || "").toLowerCase();
+      const rowCourse= (row.getAttribute("data-course")   || "").toLowerCase();
+      const rowDur   = (row.getAttribute("data-duration") || "").toLowerCase();
+      const rowId    = (row.getAttribute("data-id")       || "").toLowerCase();
+
+      const matchSearch   = !search   || name.includes(search) || rowCourse.includes(search) || rowId.includes(search);
+      const matchCourse   = !course   || rowCourse === course;
+      const matchDuration = !duration || rowDur === duration;
+
+      if (matchSearch && matchCourse && matchDuration) {
+        row.style.display = "";
+        visible++;
+      } else {
+        row.style.display = "none";
+      }
+    });
+
+    document.getElementById("shownCount").textContent = visible;
+    document.getElementById("emptyState").style.display = visible === 0 ? "block" : "none";
+    document.getElementById("recordsCountBadge").innerHTML =
+      `<i class="bi bi-database"></i> ${visible} Record${visible !== 1 ? "s" : ""}`;
+  }
+
+  /* ---------- Clear filters ---------- */
+  function clearFilters() {
+    document.getElementById("searchInput").value    = "";
+    document.getElementById("courseFilter").value   = "";
+    document.getElementById("durationFilter").value = "";
+    filterRecords();
+  }
+
+  /* ---------- Update counters ---------- */
+  function updateCounters() {
+    const total = document.querySelectorAll("#recordsBody tr").length;
+    document.getElementById("totalCount").textContent   = total;
+    document.getElementById("totalRecords").textContent = total;
+    document.getElementById("shownCount").textContent   = total;
+    document.getElementById("recordsCountBadge").innerHTML =
+      `<i class="bi bi-database"></i> ${total} Record${total !== 1 ? "s" : ""}`;
+  }
+
+  /* ---------- Active nav link on scroll ---------- */
+  window.addEventListener("scroll", () => {
+    const sections = ["home", "add-record", "view-records"];
+    const links    = document.querySelectorAll(".nav-link-custom");
+    const scrollY  = window.scrollY + 100;
+
+    sections.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && scrollY >= el.offsetTop && scrollY < el.offsetTop + el.offsetHeight) {
+        links.forEach(l => l.classList.remove("active"));
+        if (links[i]) links[i].classList.add("active");
+      }
+    });
+  });
+</script>
+
+<!--
+===========================================
+  SQL SCHEMA (MySQL) — EntityRecord Table
+===========================================
+
+-- Create the database (optional)
+CREATE DATABASE IF NOT EXISTS trackwise_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE trackwise_db;
+
+-- =============================================
+-- TABLE: EntityRecord
+-- Stores course enrollment information
+-- =============================================
+CREATE TABLE IF NOT EXISTS EntityRecord (
+    enrollment_id   VARCHAR(20)  NOT NULL,          -- Primary Key: e.g. TW-2024-001
+    full_name       VARCHAR(100) NOT NULL,           -- Student full name
+    course          VARCHAR(100) NOT NULL,           -- Course name
+    instructor      VARCHAR(100) NOT NULL,           -- Instructor name
+    start_date      DATE         NOT NULL,           -- Course start date
+    duration        VARCHAR(20)  NOT NULL,           -- Duration: e.g. '6 Months'
+    status          ENUM('Active','Inactive','Review')
+                                 NOT NULL
+                                 DEFAULT 'Active',   -- Enrollment status
+    created_at      TIMESTAMP    NOT NULL
+                                 DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP    NOT NULL
+                                 DEFAULT CURRENT_TIMESTAMP
+                                 ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_enrollment PRIMARY KEY (enrollment_id),
+    CONSTRAINT chk_start_date CHECK (start_date >= '2020-01-01')
+) ENGINE=InnoDB;
+
+-- =============================================
+-- INDEXES for performance
+-- =============================================
+CREATE INDEX idx_course      ON EntityRecord(course);
+CREATE INDEX idx_instructor  ON EntityRecord(instructor);
+CREATE INDEX idx_status      ON EntityRecord(status);
+
+-- =============================================
+-- SAMPLE DATA — 3 INSERT statements
+-- =============================================
+INSERT INTO EntityRecord
+    (enrollment_id, full_name, course, instructor, start_date, duration, status)
+VALUES
+    ('TW-2024-001', 'Rahul Sharma',   'Data Science',          'Dr. Priya Iyer', '2024-01-15', '6 Months',  'Active'),
+    ('TW-2024-002', 'Priya Krishnan', 'Full Stack Development', 'Ms. Aisha Nair', '2024-02-01', '12 Months', 'Active'),
+    ('TW-2024-003', 'Arjun Mehta',    'UI/UX Design',          'Dr. Priya Iyer', '2024-03-10', '3 Months',  'Review'),
+    ('TW-2024-004', 'Sneha Patel',    'Cloud Computing',       'Ms. Aisha Nair', '2024-04-05', '6 Months',  'Active'),
+    ('TW-2024-005', 'Vikram Nair',    'Cybersecurity',         'Dr. Priya Iyer', '2024-05-20', '6 Months',  'Inactive');
+
+-- =============================================
+-- USEFUL QUERIES
+-- =============================================
+-- Fetch all active records
+SELECT * FROM EntityRecord WHERE status = 'Active' ORDER BY start_date DESC;
+
+-- Search by name or course
+SELECT * FROM EntityRecord
+WHERE full_name LIKE '%Rahul%' OR course LIKE '%Science%';
+
+-- Count by course
+SELECT course, COUNT(*) AS total
+FROM EntityRecord
+GROUP BY course
+ORDER BY total DESC;
+
+===========================================
+-->
+
+</body>
+</html>
